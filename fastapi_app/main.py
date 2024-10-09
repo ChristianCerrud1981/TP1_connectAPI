@@ -4,6 +4,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.wsgi import WSGIMiddleware
 from fastapi.templating import Jinja2Templates
+import uvicorn
 
 #Add the root directory to the syspatch
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -20,7 +21,7 @@ templates_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templat
 static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'static'))
 
 #serve static files
-app.mount("static", StaticFiles(directory=static_dir))
+app.mount("/static", StaticFiles(directory=static_dir))
 
 #set up Jinja2 template for rendering HTML files
 templates = Jinja2Templates(directory=templates_dir)
@@ -32,3 +33,6 @@ users = {'admin': "password"}
 @app.get("/")
 async def home_page(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
+
+if __name__ == '__main__':
+    uvicorn.run(app, host='127.0.0.1', port=8001, workers=1)
