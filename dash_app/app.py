@@ -1,8 +1,6 @@
 # dash_app/app.py
 import dash, requests
 from dash import html, dcc
-from weather_app import app as app_weather
-from news_app import app as app_news
 
 # Initialize the Dash application
 app = dash.Dash(__name__, requests_pathname_prefix="/dashboard/")

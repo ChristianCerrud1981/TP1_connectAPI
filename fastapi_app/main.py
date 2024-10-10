@@ -9,9 +9,6 @@ from fastapi.middleware.wsgi import WSGIMiddleware
 from fastapi.templating import Jinja2Templates
 import uvicorn
 from dash_app import app as app_dash
-from weather_app import app as app_weather
-from news_app import app as app_news
-
 
 
 #create app
