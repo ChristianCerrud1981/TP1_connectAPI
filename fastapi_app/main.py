@@ -8,7 +8,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.wsgi import WSGIMiddleware
 from fastapi.templating import Jinja2Templates
 import uvicorn
+from dash_app import app as app_dash
 from weather_app import app as app_weather
+from news_app import app as app_news
 
 
 
@@ -57,7 +59,7 @@ async def logout(request: Request):
     return response
     
 #Mount the Dash under the /dashboard path 
-app.mount("/dashboard", WSGIMiddleware(app_weather.server))
+app.mount("/dashboard", WSGIMiddleware(app_dash.server))
 
 if __name__ == '__main__':
     uvicorn.run(app, host='127.0.0.1', port=8001, workers=1)

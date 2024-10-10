@@ -22,7 +22,7 @@ app.layout = html.Div(children=[
 
     html.H1(children="WeatherAPI"),
     
-    html.Div(children="The weather"),
+    html.Div(children=f"The weather Today"),
     # Display date, time, and weather info at the top of the dashboard
     html.Div([
         html.H3(f"Date: {info['date']}"),

@@ -1,6 +1,8 @@
 # dash_app/app.py
 import dash, requests
 from dash import html, dcc
+from weather_app import app as app_weather
+from news_app import app as app_news
 
 # Initialize the Dash application
 app = dash.Dash(__name__, requests_pathname_prefix="/dashboard/")
@@ -20,9 +22,9 @@ info = get_external_info()
 # Define Dash layout with 4 example graphs
 app.layout = html.Div(children=[
 
-    html.H1(children="NewsAPI"),
+    html.H1(children="WeatherAPI"),
     
-    html.Div(children="The News Today"),
+    html.Div(children=f"The weather Today"),
     # Display date, time, and weather info at the top of the dashboard
     html.Div([
         html.H3(f"Date: {info['date']}"),
