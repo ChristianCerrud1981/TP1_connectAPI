@@ -8,29 +8,56 @@ from news_app import app as app_news
 app = dash.Dash(__name__, requests_pathname_prefix="/dashboard/")
 
 # External API URL (replace with the actual URL)
-EXTERNAL_API_URL = "https://weather1003.azurewebsites.net/info"
+EXTERNAL_API_URL_WEATHER = "http://127.0.0.1:8025/info"
+EXTERNAL_API_URL_NEWS = "http://127.0.0.1:8015/info"
 
  
-def get_external_info():
+def get_weather_info():
     try:
-        response = requests.get(EXTERNAL_API_URL)
+        response = requests.get(EXTERNAL_API_URL_WEATHER)
         return response.json()  # Convert response to JSON
     except Exception as e:
         return {"date": "N/A", "time": "N/A", "weather": {"city": "Unknown", "temperature": "N/A", "description": "N/A"}}
-info = get_external_info()
+infoWeather = get_weather_info()
 
-# Define Dash layout with 4 example graphs
+def get_news_info():
+    try:
+        response = requests.get(EXTERNAL_API_URL_NEWS)
+        data = response.json()
+        
+        # Check if 'articles' is in the response
+        if 'news' in data and 'articles' in data['news']:
+            return data['news']['articles']
+        else:
+            return [{"author": "Unknown", "title": "N/A", "description": "No news available"}]
+    except Exception as e:
+        return [{"author": "Unknown", "title": "N/A", "description": f"Error fetching news data: {str(e)}"}]
+
+infoNews = get_news_info()
+
 app.layout = html.Div(children=[
 
     html.H1(children="WeatherAPI"),
     
-    html.Div(children=f"The weather Today"),
+    html.H2(children=f"The weather Today"),
     # Display date, time, and weather info at the top of the dashboard
     html.Div([
-        html.H3(f"Date: {info['date']}"),
-        html.H3(f"Time: {info['time']}"),
-        html.H3(f"Weather in {info['weather']['city']}: {info['weather']['temperature']} °C, {info['weather']['description']}"),
+        html.H3(f"Date: {infoWeather['date']}"),
+        html.H3(f"Time: {infoWeather['time']}"),
+        html.H3(f"Weather in {infoWeather['weather']['city']}: {infoWeather['weather']['temperature']} °C, {infoWeather['weather']['description']}"),
     ], style={'marginBottom': 20}),
+    
+    # Display date, time, and weather info at the top of the dashboard
+    html.H2(children="Latest News"),
+    html.Div([
+        html.Div([
+            html.H4(f"Title: {article['title']}"),
+            html.P(f"Author: {article['author']}"),
+            html.P(f"Description: {article['description']}"),
+        ], style={'marginBottom': 20}) 
+        for article in infoNews  # Loop over each article in the news response
+    ]),
+
      # Navigation Links using html.A to redirect to FastAPI routes
     html.Div([
         html.A('Home', href='/'),  # Redirect to FastAPI's home route
