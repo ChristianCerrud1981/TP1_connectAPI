@@ -1,13 +1,16 @@
 import sys, os
+#Add the root directory to the syspatch
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.wsgi import WSGIMiddleware
 from fastapi.templating import Jinja2Templates
 import uvicorn
+from weather_app import app as app_weather
 
-#Add the root directory to the syspatch
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 
 #create app
 app = FastAPI()
@@ -37,6 +40,24 @@ async def home_page(request: Request):
 @app.get("/login")
 async def home_page(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
+
+@app.post("/login")
+async def login(request: Request, username: str = Form(...),password: str = Form(...)):
+    if username in users and users[username] == password:
+        #Redirect to the dashboard generated with dash upon success
+        response = RedirectResponse(url="/dashboard", status_code=302)
+        response.set_cookie(key="Authorization", value="Bearer Token", httponly=True)
+        return response
+    return templates.TemplateResponse("login.html", {"request": request, "error": "Invalid credential"})
+
+@app.get("/logout")
+async def logout(request: Request):
+    response = RedirectResponse(url='/login')
+    response.delete_cookie("Authorization")
+    return response
+    
+#Mount the Dash under the /dashboard path 
+app.mount("/dashboard", WSGIMiddleware(app_weather.server))
 
 if __name__ == '__main__':
     uvicorn.run(app, host='127.0.0.1', port=8001, workers=1)
